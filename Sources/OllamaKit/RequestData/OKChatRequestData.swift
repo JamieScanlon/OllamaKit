@@ -28,7 +28,7 @@ public struct OKChatRequestData: Sendable {
     public var options: OKCompletionOptions?
     
     public init(model: String, messages: [Message], tools: [OKJSONValue]? = nil, format: OKJSONValue? = nil) {
-        self.stream = tools == nil
+        self.stream = true
         self.model = model
         self.messages = messages
         self.tools = tools
