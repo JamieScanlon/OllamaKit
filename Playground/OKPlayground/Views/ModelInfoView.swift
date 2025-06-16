@@ -43,6 +43,11 @@ struct ModelInfoView: View {
                     Section("Template") {
                         Text(modelInfo.template)
                     }
+                    Section("Capabilities") {
+                        List(modelInfo.capabilities, id: \.rawValue.self){
+                            Text($0.rawValue)
+                        }
+                    }
                 }
                 
                 Section {

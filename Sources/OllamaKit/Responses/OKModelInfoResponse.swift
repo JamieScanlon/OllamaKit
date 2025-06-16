@@ -21,6 +21,20 @@ public struct OKModelInfoResponse: Decodable, Sendable {
     /// A string detailing the parameters or settings of the model.
     public let parameters: String
     
+    /// A list of model capabilities (like vision, tools)
+    public let capabilities: [Capability]
+    
+    /// An enumeration representing the exact model capability
+    public enum Capability: String, Decodable, Sendable {
+        // https://github.com/ollama/ollama/blob/main/types/model/capability.go
+        case completion
+        case tools
+        case insert
+        case vision
+        case embedding
+        case thinking
+    }
+    
     /// The details about the model.
     public let details: ModelDetails
     
@@ -95,6 +109,4 @@ public struct OKModelInfoResponse: Decodable, Sendable {
             case tokenizerGGMLTokens = "tokenizer.ggml.tokens"
         }
     }
-    
-    public let Capabilities: [String]?
 }
