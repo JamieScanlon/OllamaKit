@@ -5,6 +5,7 @@
 //  Created by Augustinas Malinauskas on 12/12/2023.
 //
 
+import EasyJSON
 import Foundation
 
 /// A structure that represents the response to a chat request from the Ollama API.
@@ -76,8 +77,8 @@ public struct OKChatResponse: OKCompletionResponse, Decodable, Sendable {
                 /// The name of the tool being called.
                 public let name: String?
                 
-                /// An optional ``OKJSONValue`` representing the arguments passed to the tool.
-                public let arguments: OKJSONValue?
+                /// An optional ``JSON`` representing the arguments passed to the tool.
+                public let arguments: JSON?
             }
         }
     }

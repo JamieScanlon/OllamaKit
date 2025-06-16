@@ -5,6 +5,7 @@
 //  Created by Kevin Hermawan on 10/11/23.
 //
 
+import EasyJSON
 import Foundation
 
 /// A structure that encapsulates the data required for generating responses using the Ollama API.
@@ -20,9 +21,9 @@ public struct OKGenerateRequestData: Sendable {
     /// An optional array of base64-encoded images.
     public let images: [String]?
 
-    /// Optional ``OKJSONValue`` representing the JSON schema for the response.
+    /// Optional ``JSON`` representing the JSON schema for the response.
     /// Be sure to also include "return as JSON" in your prompt
-    public let format: OKJSONValue?
+    public let format: JSON?
 
     /// An optional string specifying the system message.
     public var system: String?
@@ -33,7 +34,7 @@ public struct OKGenerateRequestData: Sendable {
     /// Optional ``OKCompletionOptions`` providing additional configuration for the generation request.
     public var options: OKCompletionOptions?
     
-    public init(model: String, prompt: String, images: [String]? = nil, format: OKJSONValue? = nil) {
+    public init(model: String, prompt: String, images: [String]? = nil, format: JSON? = nil) {
         self.stream = true
         self.model = model
         self.prompt = prompt

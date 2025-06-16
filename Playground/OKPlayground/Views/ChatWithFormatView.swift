@@ -5,6 +5,7 @@
 //  Created by Michel-Andre Chirita on 30/12/2024.
 //
 
+import EasyJSON
 import OllamaKit
 import SwiftUI
 
@@ -99,7 +100,7 @@ struct ChatWithFormatView: View {
         }
     }
     
-    private func getFormat() -> OKJSONValue {
+    private func getFormat() -> JSON {
         return
             .object(["type": .string("array"),
                      "items": .object([

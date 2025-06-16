@@ -5,6 +5,7 @@
 //  Created by Kevin Hermawan on 28/07/24.
 //
 
+import EasyJSON
 import OllamaKit
 import SwiftUI
 
@@ -75,7 +76,7 @@ struct ChatWithToolsView: View {
         }
     }
     
-    private func getTools() -> [OKJSONValue] {
+    private func getTools() -> [JSON] {
         return [
             .object([
                 "type": .string("function"),

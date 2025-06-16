@@ -1,5 +1,15 @@
 {
+  "originHash" : "2ba3dd3dcc28e56bdbcb0a2ccda4e7b0d98ff481ee6ef8c684e84f04c481ccbd",
   "pins" : [
+    {
+      "identity" : "easyjson",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/JamieScanlon/EasyJSON.git",
+      "state" : {
+        "revision" : "b945f9f9539ab73339f8b2ec7df3112535608e58",
+        "version" : "1.0.0"
+      }
+    },
     {
       "identity" : "swift-docc-plugin",
       "kind" : "remoteSourceControl",
@@ -19,5 +29,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

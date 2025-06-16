@@ -5,6 +5,7 @@
 //  Created by Augustinas Malinauskas on 12/12/2023.
 //
 
+import EasyJSON
 import Foundation
 
 /// A structure that encapsulates data for chat requests to the Ollama API.
@@ -17,17 +18,17 @@ public struct OKChatRequestData: Sendable {
     /// An array of ``Message`` instances representing the content to be sent to the Ollama API.
     public let messages: [Message]
     
-    /// An optional array of ``OKJSONValue`` representing the tools available for tool calling in the chat.
-    public let tools: [OKJSONValue]?
+    /// An optional array of ``JSON`` representing the tools available for tool calling in the chat.
+    public let tools: [JSON]?
 
-    /// Optional ``OKJSONValue`` representing the JSON schema for the response.
+    /// Optional ``JSON`` representing the JSON schema for the response.
     /// Be sure to also include "return as JSON" in your prompt
-    public let format: OKJSONValue?
+    public let format: JSON?
 
     /// Optional ``OKCompletionOptions`` providing additional configuration for the chat request.
     public var options: OKCompletionOptions?
     
-    public init(model: String, messages: [Message], tools: [OKJSONValue]? = nil, format: OKJSONValue? = nil) {
+    public init(model: String, messages: [Message], tools: [JSON]? = nil, format: JSON? = nil) {
         self.stream = true
         self.model = model
         self.messages = messages
