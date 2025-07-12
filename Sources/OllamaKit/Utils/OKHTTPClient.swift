@@ -27,7 +27,8 @@ internal extension OKHTTPClient {
         return try decoder.decode(T.self, from: data)
     }
     
-    func stream<T: Decodable>(request: URLRequest, with responseType: T.Type) -> AsyncThrowingStream<T, Error> {
+    /// NOTE: T must be Sendable because values are sent across concurrency domains for streaming.
+    func stream<T: Decodable & Sendable>(request: URLRequest, with responseType: T.Type) -> AsyncThrowingStream<T, Error> {
         return AsyncThrowingStream { continuation in
             Task {
                 do {
@@ -90,7 +91,8 @@ internal extension OKHTTPClient {
             .eraseToAnyPublisher()
     }
     
-    func stream<T: Decodable>(request: URLRequest, with responseType: T.Type) -> AnyPublisher<T, Error> {
+    /// NOTE: T must be Sendable because values are sent across concurrency domains for streaming.
+    func stream<T: Decodable & Sendable>(request: URLRequest, with responseType: T.Type) -> AnyPublisher<T, Error> {
         let delegate = StreamingDelegate()
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: .main)
         
