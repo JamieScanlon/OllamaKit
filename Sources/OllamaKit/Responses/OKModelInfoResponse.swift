@@ -65,8 +65,8 @@ public struct OKModelInfoResponse: Decodable, Sendable {
     public struct ModelInfo: Decodable, Sendable {
         public let generalArchitecture: String
 //        public let generalFileType: Int
-        public let generalParameterCount: Int
-        public let generalQuantizationVersion: Int
+//        public let generalParameterCount: Int
+//        public let generalQuantizationVersion: Int
         public let llamaAttentionHeadCount: Int
         public let llamaAttentionHeadCountKV: Int
         public let llamaAttentionLayerNormRMSEpsilon: Double
@@ -88,8 +88,8 @@ public struct OKModelInfoResponse: Decodable, Sendable {
         enum CodingKeys: String, CodingKey {
             case generalArchitecture = "general.architecture"
 //            case generalFileType = "general.file_type"
-            case generalParameterCount = "general.parameter_count"
-            case generalQuantizationVersion = "general.quantization_version"
+//            case generalParameterCount = "general.parameter_count"
+//            case generalQuantizationVersion = "general.quantization_version"
             case llamaAttentionHeadCount = "llama.attention.head_count"
             case llamaAttentionHeadCountKV = "llama.attention.head_count_kv"
             case llamaAttentionLayerNormRMSEpsilon = "llama.attention.layer_norm_rms_epsilon"
