@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import EasyJSON
 
 /// A structure that represents the response containing information about a specific model from the Ollama API.
 public struct OKModelInfoResponse: Decodable, Sendable {
@@ -31,7 +32,7 @@ public struct OKModelInfoResponse: Decodable, Sendable {
     public let modifiedAt: Date?
     
     /// An enumeration representing the exact model capability
-    public enum Capability: String, Decodable, Sendable {
+            public enum Capability: String, Decodable, Sendable {
         // https://github.com/ollama/ollama/blob/main/types/model/capability.go
         case completion
         case tools
@@ -45,7 +46,7 @@ public struct OKModelInfoResponse: Decodable, Sendable {
     public let details: ModelDetails
     
     /// A structure that represents the details of the model.
-    public struct ModelDetails: Decodable, Sendable {
+            public struct ModelDetails: Decodable, Sendable {
         
         ///
         public let parentModel: String
@@ -73,16 +74,12 @@ public struct OKModelInfoResponse: Decodable, Sendable {
         public let generalFileType: Int
         public let generalParameterCount: Int
         public let generalQuantizationVersion: Int
-        public let llamaAttentionHeadCount: Int
-        public let llamaAttentionHeadCountKV: Int
-        public let llamaAttentionLayerNormRMSEpsilon: Double
-        public let llamaBlockCount: Int
-        public let llamaContextLength: Int
-        public let llamaEmbeddingLength: Int
-        public let llamaFeedForwardLength: Int
-        public let llamaRopeDimensionCount: Int
-        public let llamaRopeFreqBase: Int
-        public let llamaVocabSize: Int
+        
+        // Generic storage for all family-specific properties
+        public let familyProperties: [String: [String: JSON]]
+        
+        // Note: familyProperties is now Sendable since JSON conforms to Sendable
+        
         public let tokenizerGGMLBosTokenID: Int
         public let tokenizerGGMLEosTokenID: Int
         public let tokenizerGGMLMerges: [String]?
@@ -99,16 +96,6 @@ public struct OKModelInfoResponse: Decodable, Sendable {
             case generalFileType = "general.fileType"
             case generalParameterCount = "general.parameterCount"
             case generalQuantizationVersion = "general.quantizationVersion"
-            case llamaAttentionHeadCount = "llama4.attention.headCount"
-            case llamaAttentionHeadCountKV = "llama4.attention.headCountKv"
-            case llamaAttentionLayerNormRMSEpsilon = "llama4.attention.layerNormRmsEpsilon"
-            case llamaBlockCount = "llama4.blockCount"
-            case llamaContextLength = "llama4.contextLength"
-            case llamaEmbeddingLength = "llama4.embeddingLength"
-            case llamaFeedForwardLength = "llama4.feedForwardLength"
-            case llamaRopeDimensionCount = "llama4.rope.dimensionCount"
-            case llamaRopeFreqBase = "llama4.rope.freqBase"
-            case llamaVocabSize = "llama4.vocabSize"
             case tokenizerGGMLBosTokenID = "tokenizer.ggml.bosTokenId"
             case tokenizerGGMLEosTokenID = "tokenizer.ggml.eosTokenId"
             case tokenizerGGMLMerges = "tokenizer.ggml.merges"
@@ -127,71 +114,6 @@ public struct OKModelInfoResponse: Decodable, Sendable {
             generalParameterCount = try container.decode(Int.self, forKey: .generalParameterCount)
             generalQuantizationVersion = try container.decode(Int.self, forKey: .generalQuantizationVersion)
             
-            // Try to decode llama4 fields first, then fall back to llama fields
-            let llama4Container = try decoder.container(keyedBy: Llama4CodingKeys.self)
-            let llamaContainer = try decoder.container(keyedBy: LlamaCodingKeys.self)
-            
-            // Try llama4 first, then fall back to llama
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaAttentionHeadCount) {
-                llamaAttentionHeadCount = value
-            } else {
-                llamaAttentionHeadCount = try llamaContainer.decode(Int.self, forKey: .llamaAttentionHeadCount)
-            }
-            
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaAttentionHeadCountKV) {
-                llamaAttentionHeadCountKV = value
-            } else {
-                llamaAttentionHeadCountKV = try llamaContainer.decode(Int.self, forKey: .llamaAttentionHeadCountKV)
-            }
-            
-            if let value = try? llama4Container.decode(Double.self, forKey: .llamaAttentionLayerNormRMSEpsilon) {
-                llamaAttentionLayerNormRMSEpsilon = value
-            } else {
-                llamaAttentionLayerNormRMSEpsilon = try llamaContainer.decode(Double.self, forKey: .llamaAttentionLayerNormRMSEpsilon)
-            }
-            
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaBlockCount) {
-                llamaBlockCount = value
-            } else {
-                llamaBlockCount = try llamaContainer.decode(Int.self, forKey: .llamaBlockCount)
-            }
-            
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaContextLength) {
-                llamaContextLength = value
-            } else {
-                llamaContextLength = try llamaContainer.decode(Int.self, forKey: .llamaContextLength)
-            }
-            
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaEmbeddingLength) {
-                llamaEmbeddingLength = value
-            } else {
-                llamaEmbeddingLength = try llamaContainer.decode(Int.self, forKey: .llamaEmbeddingLength)
-            }
-            
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaFeedForwardLength) {
-                llamaFeedForwardLength = value
-            } else {
-                llamaFeedForwardLength = try llamaContainer.decode(Int.self, forKey: .llamaFeedForwardLength)
-            }
-            
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaRopeDimensionCount) {
-                llamaRopeDimensionCount = value
-            } else {
-                llamaRopeDimensionCount = try llamaContainer.decode(Int.self, forKey: .llamaRopeDimensionCount)
-            }
-            
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaRopeFreqBase) {
-                llamaRopeFreqBase = value
-            } else {
-                llamaRopeFreqBase = try llamaContainer.decode(Int.self, forKey: .llamaRopeFreqBase)
-            }
-            
-            if let value = try? llama4Container.decode(Int.self, forKey: .llamaVocabSize) {
-                llamaVocabSize = value
-            } else {
-                llamaVocabSize = try llamaContainer.decode(Int.self, forKey: .llamaVocabSize)
-            }
-            
             // Decode tokenizer fields
             tokenizerGGMLBosTokenID = try container.decode(Int.self, forKey: .tokenizerGGMLBosTokenID)
             tokenizerGGMLEosTokenID = try container.decode(Int.self, forKey: .tokenizerGGMLEosTokenID)
@@ -200,34 +122,156 @@ public struct OKModelInfoResponse: Decodable, Sendable {
             tokenizerGGMLPre = try container.decode(String.self, forKey: .tokenizerGGMLPre)
             tokenizerGGMLTokenType = try container.decodeIfPresent([String].self, forKey: .tokenizerGGMLTokenType)
             tokenizerGGMLTokens = try container.decodeIfPresent([String].self, forKey: .tokenizerGGMLTokens)
+            
+            // Parse all family-specific properties dynamically
+            var familyProps: [String: [String: JSON]] = [:]
+            
+            // Get all keys from the decoder using a different approach
+            let allKeysContainer = try decoder.container(keyedBy: AllKeysCodingKeys.self)
+            
+            // Get all available keys and dynamically group them by family
+            let allKeys = allKeysContainer.allKeys
+            
+            for key in allKeys {
+                let keyString = key.stringValue
+                
+                // Skip keys that are already handled by our explicit CodingKeys
+                if keyString.hasPrefix("general.") || keyString.hasPrefix("tokenizer.") {
+                    continue
+                }
+                
+                // Check if this is a family-specific key (e.g., "llama.attention.headCount")
+                let components = keyString.split(separator: ".", maxSplits: 1)
+                if components.count == 2 {
+                    let family = String(components[0])
+                    let propertyPath = String(components[1])
+                    
+                    // Try to decode the value
+                    if let value = try? allKeysContainer.decode(AnyCodable.self, forKey: key) {
+                        // Initialize family dictionary if it doesn't exist
+                        if familyProps[family] == nil {
+                            familyProps[family] = [:]
+                        }
+                        
+                        if let jsonValue = try? JSON(value.value) {
+                            familyProps[family]?[propertyPath] = jsonValue
+                        }
+                    }
+                }
+            }
+            
+            familyProperties = familyProps
         }
         
-        // Coding keys for llama4 prefix
-        private enum Llama4CodingKeys: String, CodingKey {
-            case llamaAttentionHeadCount = "llama4.attention.headCount"
-            case llamaAttentionHeadCountKV = "llama4.attention.headCountKv"
-            case llamaAttentionLayerNormRMSEpsilon = "llama4.attention.layerNormRmsEpsilon"
-            case llamaBlockCount = "llama4.blockCount"
-            case llamaContextLength = "llama4.contextLength"
-            case llamaEmbeddingLength = "llama4.embeddingLength"
-            case llamaFeedForwardLength = "llama4.feedForwardLength"
-            case llamaRopeDimensionCount = "llama4.rope.dimensionCount"
-            case llamaRopeFreqBase = "llama4.rope.freqBase"
-            case llamaVocabSize = "llama4.vocabSize"
+        // Helper method to get a property value for a specific family
+        public func getProperty<T>(family: String, property: String) -> T? {
+            guard let jsonValue = familyProperties[family]?[property] else { return nil }
+            
+            // Extract the value based on the expected type T
+            switch T.self {
+            case is Int.Type:
+                if case .integer(let value) = jsonValue {
+                    return value as? T
+                }
+            case is Double.Type:
+                if case .double(let value) = jsonValue {
+                    return value as? T
+                }
+            case is String.Type:
+                if case .string(let value) = jsonValue {
+                    return value as? T
+                }
+            case is Bool.Type:
+                if case .boolean(let value) = jsonValue {
+                    return value as? T
+                }
+            default:
+                break
+            }
+            
+            return nil
         }
         
-        // Coding keys for llama prefix
-        private enum LlamaCodingKeys: String, CodingKey {
-            case llamaAttentionHeadCount = "llama.attention.headCount"
-            case llamaAttentionHeadCountKV = "llama.attention.headCountKv"
-            case llamaAttentionLayerNormRMSEpsilon = "llama.attention.layerNormRmsEpsilon"
-            case llamaBlockCount = "llama.blockCount"
-            case llamaContextLength = "llama.contextLength"
-            case llamaEmbeddingLength = "llama.embeddingLength"
-            case llamaFeedForwardLength = "llama.feedForwardLength"
-            case llamaRopeDimensionCount = "llama.rope.dimensionCount"
-            case llamaRopeFreqBase = "llama.rope.freqBase"
-            case llamaVocabSize = "llama.vocabSize"
+        // Helper method to get all properties for a specific family
+        public func getFamilyProperties(family: String) -> [String: JSON]? {
+            return familyProperties[family]
+        }
+        
+        // Helper method to get all available families
+        public func getAvailableFamilies() -> [String] {
+            return Array(familyProperties.keys)
+        }
+    }
+    
+
+    
+    // Helper struct for all possible keys
+    private struct AllKeysCodingKeys: CodingKey {
+        var stringValue: String
+        var intValue: Int?
+        
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+            self.intValue = nil
+        }
+        
+        init?(intValue: Int) {
+            self.stringValue = String(intValue)
+            self.intValue = intValue
+        }
+    }
+    
+    // Helper struct for decoding any JSON value
+    private struct AnyCodable: Codable {
+        let value: Any
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            
+            if container.decodeNil() {
+                value = NSNull()
+            } else if let bool = try? container.decode(Bool.self) {
+                value = bool
+            } else if let int = try? container.decode(Int.self) {
+                value = int
+            } else if let double = try? container.decode(Double.self) {
+                value = double
+            } else if let string = try? container.decode(String.self) {
+                value = string
+            } else if let array = try? container.decode([AnyCodable].self) {
+                value = array.map { $0.value }
+            } else if let dictionary = try? container.decode([String: AnyCodable].self) {
+                value = dictionary.mapValues { $0.value }
+            } else {
+                throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyCodable cannot decode value")
+            }
+        }
+        
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            
+            switch value {
+            case is NSNull:
+                try container.encodeNil()
+            case let bool as Bool:
+                try container.encode(bool)
+            case let int as Int:
+                try container.encode(int)
+            case let double as Double:
+                try container.encode(double)
+            case let string as String:
+                try container.encode(string)
+            case let array as [Any]:
+                try container.encode(array.map { AnyCodable(value: $0) })
+            case let dictionary as [String: Any]:
+                try container.encode(dictionary.mapValues { AnyCodable(value: $0) })
+            default:
+                try container.encodeNil()
+            }
+        }
+        
+        init(value: Any) {
+            self.value = value
         }
     }
 }

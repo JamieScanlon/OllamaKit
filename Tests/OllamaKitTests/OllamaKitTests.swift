@@ -138,16 +138,16 @@ final class OllamaKitTests: XCTestCase {
             XCTAssertEqual(response.modelInfo.generalFileType, 15)
             XCTAssertEqual(response.modelInfo.generalParameterCount, 108641793600)
             XCTAssertEqual(response.modelInfo.generalQuantizationVersion, 2)
-            XCTAssertEqual(response.modelInfo.llamaAttentionHeadCount, 40)
-            XCTAssertEqual(response.modelInfo.llamaAttentionHeadCountKV, 8)
-            XCTAssertEqual(response.modelInfo.llamaAttentionLayerNormRMSEpsilon, 0.00001, accuracy: 0.000001)
-            XCTAssertEqual(response.modelInfo.llamaBlockCount, 48)
-            XCTAssertEqual(response.modelInfo.llamaContextLength, 10485760)
-            XCTAssertEqual(response.modelInfo.llamaEmbeddingLength, 5120)
-            XCTAssertEqual(response.modelInfo.llamaFeedForwardLength, 16384)
-            XCTAssertEqual(response.modelInfo.llamaRopeDimensionCount, 128)
-            XCTAssertEqual(response.modelInfo.llamaRopeFreqBase, 500000)
-            XCTAssertEqual(response.modelInfo.llamaVocabSize, 202048)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "attention.headCount"), 40)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "attention.headCountKv"), 8)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "attention.layerNormRmsEpsilon") as Double? ?? 1.0, 0.00001, accuracy: 0.000001)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "blockCount"), 48)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "contextLength"), 10485760)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "embeddingLength"), 5120)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "feedForwardLength"), 16384)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "rope.dimensionCount"), 128)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "rope.freqBase"), 500000)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama4", property: "vocabSize"), 202048)
             XCTAssertEqual(response.modelInfo.tokenizerGGMLBosTokenID, 200000)
             XCTAssertEqual(response.modelInfo.tokenizerGGMLEosTokenID, 200008)
             XCTAssertEqual(response.modelInfo.tokenizerGGMLModel, "gpt2")
@@ -242,16 +242,16 @@ final class OllamaKitTests: XCTestCase {
             XCTAssertEqual(response.modelInfo.generalFileType, 2)
             XCTAssertEqual(response.modelInfo.generalParameterCount, 8030261248)
             XCTAssertEqual(response.modelInfo.generalQuantizationVersion, 2)
-            XCTAssertEqual(response.modelInfo.llamaAttentionHeadCount, 32)
-            XCTAssertEqual(response.modelInfo.llamaAttentionHeadCountKV, 8)
-            XCTAssertEqual(response.modelInfo.llamaAttentionLayerNormRMSEpsilon, 0.00001, accuracy: 0.000001)
-            XCTAssertEqual(response.modelInfo.llamaBlockCount, 32)
-            XCTAssertEqual(response.modelInfo.llamaContextLength, 8192)
-            XCTAssertEqual(response.modelInfo.llamaEmbeddingLength, 4096)
-            XCTAssertEqual(response.modelInfo.llamaFeedForwardLength, 14336)
-            XCTAssertEqual(response.modelInfo.llamaRopeDimensionCount, 128)
-            XCTAssertEqual(response.modelInfo.llamaRopeFreqBase, 500000)
-            XCTAssertEqual(response.modelInfo.llamaVocabSize, 128256)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "attention.headCount"), 32)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "attention.headCountKv"), 8)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "attention.layerNormRmsEpsilon") as Double? ?? 1.0, 0.00001, accuracy: 0.000001)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "blockCount"), 32)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "contextLength"), 8192)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "embeddingLength"), 4096)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "feedForwardLength"), 14336)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "rope.dimensionCount"), 128)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "rope.freqBase"), 500000)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "llama", property: "vocabSize"), 128256)
             XCTAssertEqual(response.modelInfo.tokenizerGGMLBosTokenID, 128000)
             XCTAssertEqual(response.modelInfo.tokenizerGGMLEosTokenID, 128009)
             XCTAssertEqual(response.modelInfo.tokenizerGGMLModel, "gpt2")
@@ -264,6 +264,140 @@ final class OllamaKitTests: XCTestCase {
             XCTFail("Failed to decode JSON: \(error)")
         }
     }
+    
+    func testModelInfoQwen3MoeSuccess() async throws {
+        let jsonString = """
+        {
+          "license": "                                 Apache License\\n",
+          "modelfile": "# Modelfile generated",
+          "parameters": "top_p                          0.95\\nrepeat_penalty                 1\\nstop                           \\"<|im_start|>\\"\\nstop                           \\"<|im_end|>\\"\\ntemperature                    0.6\\ntop_k                          20",
+          "template": "{{- if .Messages }}",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen3moe",
+            "families": [
+              "qwen3moe"
+            ],
+            "parameter_size": "30.5B",
+            "quantization_level": "Q4_K_M"
+          },
+          "model_info": {
+            "general.architecture": "qwen3moe",
+            "general.basename": "Qwen3",
+            "general.file_type": 15,
+            "general.license": "apache-2.0",
+            "general.parameter_count": 30532122624,
+            "general.quantization_version": 2,
+            "general.size_label": "30B-A3B",
+            "general.type": "model",
+            "qwen3moe.attention.head_count": 32,
+            "qwen3moe.attention.head_count_kv": 4,
+            "qwen3moe.attention.key_length": 128,
+            "qwen3moe.attention.value_length": 128,
+            "qwen3moe.attention.layer_norm_rms_epsilon": 0.000001,
+            "qwen3moe.block_count": 48,
+            "qwen3moe.context_length": 40960,
+            "qwen3moe.embedding_length": 2048,
+            "qwen3moe.expert_count": 128,
+            "qwen3moe.expert_feed_forward_length": 768,
+            "qwen3moe.expert_used_count": 8,
+            "qwen3moe.feed_forward_length": 6144,
+            "qwen3moe.rope.freq_base": 1000000,
+            "tokenizer.ggml.add_bos_token": false,
+            "tokenizer.ggml.bos_token_id": 151643,
+            "tokenizer.ggml.eos_token_id": 151645,
+            "tokenizer.ggml.merges": null,
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.padding_token_id": 151643,
+            "tokenizer.ggml.pre": "qwen2",
+            "tokenizer.ggml.token_type": null,
+            "tokenizer.ggml.tokens": null
+          },
+          "tensors": [],
+          "capabilities": [
+            "completion",
+            "tools"
+          ],
+          "modified_at": "2025-05-16T21:56:36.914276879-07:00"
+        }
+        """
+        
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            XCTFail("Failed to convert JSON string to data")
+            return
+        }
+        
+        do {
+            let response = try JSONDecoder.default.decode(OKModelInfoResponse.self, from: jsonData)
+            
+            // Test basic fields
+            XCTAssertEqual(response.license, "                                 Apache License\n")
+            XCTAssertEqual(response.modelfile, "# Modelfile generated")
+            XCTAssertEqual(response.parameters, "top_p                          0.95\nrepeat_penalty                 1\nstop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"\ntemperature                    0.6\ntop_k                          20")
+            XCTAssertEqual(response.template, "{{- if .Messages }}")
+            XCTAssertEqual(response.capabilities.count, 2)
+            XCTAssertTrue(response.capabilities.contains(.completion))
+            XCTAssertTrue(response.capabilities.contains(.tools))
+            XCTAssertFalse(response.capabilities.contains(.vision))
+            
+            // Test system field (should be nil for this model)
+            XCTAssertNil(response.system)
+            
+            // Test modifiedAt field
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let expectedDate = dateFormatter.date(from: "2025-05-16T21:56:36.914276879-07:00")
+            XCTAssertEqual(response.modifiedAt, expectedDate)
+            
+            // Test details
+            XCTAssertEqual(response.details.parentModel, "")
+            XCTAssertEqual(response.details.format, "gguf")
+            XCTAssertEqual(response.details.family, "qwen3moe")
+            XCTAssertEqual(response.details.parameterSize, "30.5B")
+            XCTAssertEqual(response.details.quantizationLevel, "Q4_K_M")
+            XCTAssertEqual(response.details.families, ["qwen3moe"])
+            
+            // Test modelInfo - general fields
+            XCTAssertEqual(response.modelInfo.generalArchitecture, "qwen3moe")
+            XCTAssertEqual(response.modelInfo.generalFileType, 15)
+            XCTAssertEqual(response.modelInfo.generalParameterCount, 30532122624)
+            XCTAssertEqual(response.modelInfo.generalQuantizationVersion, 2)
+            
+            // Test qwen3moe family properties
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "attention.headCount"), 32)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "attention.headCountKv"), 4)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "attention.keyLength"), 128)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "attention.valueLength"), 128)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "attention.layerNormRmsEpsilon") as Double? ?? 0.0, 0.000001, accuracy: 0.000001)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "blockCount"), 48)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "contextLength"), 40960)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "embeddingLength"), 2048)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "expertCount"), 128)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "expertFeedForwardLength"), 768)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "expertUsedCount"), 8)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "feedForwardLength"), 6144)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "qwen3moe", property: "rope.freqBase"), 1000000)
+            
+            // Test tokenizer fields
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLBosTokenID, 151643)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLEosTokenID, 151645)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLModel, "gpt2")
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLPre, "qwen2")
+            XCTAssertNil(response.modelInfo.tokenizerGGMLMerges)
+            XCTAssertNil(response.modelInfo.tokenizerGGMLTokenType)
+            XCTAssertNil(response.modelInfo.tokenizerGGMLTokens)
+            
+            // Note: Qwen3Moe-specific fields like qwen3moe.attention.head_count,
+            // qwen3moe.block_count, etc. are tested above using getProperty() method
+            // to ensure the structure can handle them when fully implemented.
+            
+        } catch {
+            XCTFail("Failed to decode JSON: \(error)")
+        }
+    }
+    
+
     
     func testCopyModelSuccess() async throws {
         
