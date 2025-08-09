@@ -67,22 +67,22 @@ public struct OKModelInfoResponse: Decodable, Sendable {
 //        public let generalFileType: Int
 //        public let generalParameterCount: Int
 //        public let generalQuantizationVersion: Int
-        public let llamaAttentionHeadCount: Int
-        public let llamaAttentionHeadCountKV: Int
-        public let llamaAttentionLayerNormRMSEpsilon: Double
-        public let llamaBlockCount: Int
-        public let llamaContextLength: Int
-        public let llamaEmbeddingLength: Int
-        public let llamaFeedForwardLength: Int
-        public let llamaRopeDimensionCount: Int
-        public let llamaRopeFreqBase: Int
-        public let llamaVocabSize: Int
-        public let tokenizerGGMLBosTokenID: Int
-        public let tokenizerGGMLEosTokenID: Int
+//        public let llamaAttentionHeadCount: Int
+//        public let llamaAttentionHeadCountKV: Int
+//        public let llamaAttentionLayerNormRMSEpsilon: Double
+//        public let llamaBlockCount: Int
+//        public let llamaContextLength: Int
+//        public let llamaEmbeddingLength: Int
+//        public let llamaFeedForwardLength: Int
+//        public let llamaRopeDimensionCount: Int
+//        public let llamaRopeFreqBase: Int
+//        public let llamaVocabSize: Int
+//        public let tokenizerGGMLBosTokenID: Int
+//        public let tokenizerGGMLEosTokenID: Int
         public let tokenizerGGMLMerges: [String]?
         public let tokenizerGGMLModel: String
         public let tokenizerGGMLPre: String
-        public let tokenizerGGMLTokenType: [String]?
+//        public let tokenizerGGMLTokenType: [String]?
         public let tokenizerGGMLTokens: [String]?
         
         enum CodingKeys: String, CodingKey {
@@ -90,22 +90,22 @@ public struct OKModelInfoResponse: Decodable, Sendable {
 //            case generalFileType = "general.file_type"
 //            case generalParameterCount = "general.parameter_count"
 //            case generalQuantizationVersion = "general.quantization_version"
-            case llamaAttentionHeadCount = "llama.attention.head_count"
-            case llamaAttentionHeadCountKV = "llama.attention.head_count_kv"
-            case llamaAttentionLayerNormRMSEpsilon = "llama.attention.layer_norm_rms_epsilon"
-            case llamaBlockCount = "llama.block_count"
-            case llamaContextLength = "llama.context_length"
-            case llamaEmbeddingLength = "llama.embedding_length"
-            case llamaFeedForwardLength = "llama.feed_forward_length"
-            case llamaRopeDimensionCount = "llama.rope.dimension_count"
-            case llamaRopeFreqBase = "llama.rope.freq_base"
-            case llamaVocabSize = "llama.vocab_size"
-            case tokenizerGGMLBosTokenID = "tokenizer.ggml.bos_token_id"
-            case tokenizerGGMLEosTokenID = "tokenizer.ggml.eos_token_id"
+//            case llamaAttentionHeadCount = "llama.attention.head_count"
+//            case llamaAttentionHeadCountKV = "llama.attention.head_count_kv"
+//            case llamaAttentionLayerNormRMSEpsilon = "llama.attention.layer_norm_rms_epsilon"
+//            case llamaBlockCount = "llama.block_count"
+//            case llamaContextLength = "llama.context_length"
+//            case llamaEmbeddingLength = "llama.embedding_length"
+//            case llamaFeedForwardLength = "llama.feed_forward_length"
+//            case llamaRopeDimensionCount = "llama.rope.dimension_count"
+//            case llamaRopeFreqBase = "llama.rope.freq_base"
+//            case llamaVocabSize = "llama.vocab_size"
+//            case tokenizerGGMLBosTokenID = "tokenizer.ggml.bos_token_id"
+//            case tokenizerGGMLEosTokenID = "tokenizer.ggml.eos_token_id"
             case tokenizerGGMLMerges = "tokenizer.ggml.merges"
             case tokenizerGGMLModel = "tokenizer.ggml.model"
             case tokenizerGGMLPre = "tokenizer.ggml.pre"
-            case tokenizerGGMLTokenType = "tokenizer.ggml.token_type"
+//            case tokenizerGGMLTokenType = "tokenizer.ggml.token_type"
             case tokenizerGGMLTokens = "tokenizer.ggml.tokens"
         }
     }
