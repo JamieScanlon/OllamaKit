@@ -65,47 +65,50 @@ public struct OKModelInfoResponse: Decodable, Sendable {
     public struct ModelInfo: Decodable, Sendable {
         public let generalArchitecture: String
         public let generalFileType: Int
-//        public let generalParameterCount: Int
-//        public let generalQuantizationVersion: Int
-//        public let llamaAttentionHeadCount: Int
-//        public let llamaAttentionHeadCountKV: Int
-//        public let llamaAttentionLayerNormRMSEpsilon: Double
-//        public let llamaBlockCount: Int
-//        public let llamaContextLength: Int
-//        public let llamaEmbeddingLength: Int
-//        public let llamaFeedForwardLength: Int
-//        public let llamaRopeDimensionCount: Int
-//        public let llamaRopeFreqBase: Int
-//        public let llamaVocabSize: Int
-//        public let tokenizerGGMLBosTokenID: Int
-//        public let tokenizerGGMLEosTokenID: Int
+        public let generalParameterCount: Int
+        public let generalQuantizationVersion: Int
+        public let llamaAttentionHeadCount: Int
+        public let llamaAttentionHeadCountKV: Int
+        public let llamaAttentionLayerNormRMSEpsilon: Double
+        public let llamaBlockCount: Int
+        public let llamaContextLength: Int
+        public let llamaEmbeddingLength: Int
+        public let llamaFeedForwardLength: Int
+        public let llamaRopeDimensionCount: Int
+        public let llamaRopeFreqBase: Int
+        public let llamaVocabSize: Int
+        public let tokenizerGGMLBosTokenID: Int
+        public let tokenizerGGMLEosTokenID: Int
         public let tokenizerGGMLMerges: [String]?
         public let tokenizerGGMLModel: String
         public let tokenizerGGMLPre: String
-//        public let tokenizerGGMLTokenType: [String]?
+        public let tokenizerGGMLTokenType: [String]?
         public let tokenizerGGMLTokens: [String]?
         
+        // JSONDecoder+Default uses .convertFromSnakeCase for the Decoder
+        // Because of that the keys have to be converted to cammel case
+        // For example: "general.file_type" must be converted to "general.fileType"
         enum CodingKeys: String, CodingKey {
             case generalArchitecture = "general.architecture"
             case generalFileType = "general.fileType"
-//            case generalParameterCount = "general.parameter_count"
-//            case generalQuantizationVersion = "general.quantization_version"
-//            case llamaAttentionHeadCount = "llama.attention.head_count"
-//            case llamaAttentionHeadCountKV = "llama.attention.head_count_kv"
-//            case llamaAttentionLayerNormRMSEpsilon = "llama.attention.layer_norm_rms_epsilon"
-//            case llamaBlockCount = "llama.block_count"
-//            case llamaContextLength = "llama.context_length"
-//            case llamaEmbeddingLength = "llama.embedding_length"
-//            case llamaFeedForwardLength = "llama.feed_forward_length"
-//            case llamaRopeDimensionCount = "llama.rope.dimension_count"
-//            case llamaRopeFreqBase = "llama.rope.freq_base"
-//            case llamaVocabSize = "llama.vocab_size"
-//            case tokenizerGGMLBosTokenID = "tokenizer.ggml.bos_token_id"
-//            case tokenizerGGMLEosTokenID = "tokenizer.ggml.eos_token_id"
+            case generalParameterCount = "general.parameterCount"
+            case generalQuantizationVersion = "general.quantizationVersion"
+            case llamaAttentionHeadCount = "llama.attention.headCount"
+            case llamaAttentionHeadCountKV = "llama.attention.headCountKv"
+            case llamaAttentionLayerNormRMSEpsilon = "llama.attention.layerNormRmsEpsilon"
+            case llamaBlockCount = "llama.blockCount"
+            case llamaContextLength = "llama.contextLength"
+            case llamaEmbeddingLength = "llama.embeddingLength"
+            case llamaFeedForwardLength = "llama.feedForwardLength"
+            case llamaRopeDimensionCount = "llama.rope.dimensionCount"
+            case llamaRopeFreqBase = "llama.rope.freqBase"
+            case llamaVocabSize = "llama.vocabSize"
+            case tokenizerGGMLBosTokenID = "tokenizer.ggml.bosTokenId"
+            case tokenizerGGMLEosTokenID = "tokenizer.ggml.eosTokenId"
             case tokenizerGGMLMerges = "tokenizer.ggml.merges"
             case tokenizerGGMLModel = "tokenizer.ggml.model"
             case tokenizerGGMLPre = "tokenizer.ggml.pre"
-//            case tokenizerGGMLTokenType = "tokenizer.ggml.token_type"
+            case tokenizerGGMLTokenType = "tokenizer.ggml.tokenType"
             case tokenizerGGMLTokens = "tokenizer.ggml.tokens"
         }
     }
