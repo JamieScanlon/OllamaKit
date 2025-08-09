@@ -27,11 +27,242 @@ final class OllamaKitTests: XCTestCase {
     }
     
     func testModelInfoSuccess() async throws {
+        let jsonString = """
+        {
+          "license": "**LLAMA 4 COMMUNITY LICENSE AGREEMENT**",
+          "modelfile": "# Modelfile",
+          "parameters": "stop                           \\"<|eom|>\\"",
+          "template": "{{- if .System }}<|header_start|>system<|header_end|>\\n\\n{{ if .Tools }}Environment: ipython\\nYou have access to the following functions. To call a function, please respond with JSON for a function call. Respond in the format {\\"name\\": function name, \\"parameters\\": dictionary of argument name and its value}. Do not use variables.\\n\\n{{ range .Tools }}{{ . }}\\n\\n{{ end }}\\n{{- end }}{{ .System  }}<|eot|>\\n{{- end }}\\n{{- range $i, $_ := .Messages }}\\n{{- if eq .Role \\"system\\" }}\\n{{- continue }}\\n{{- end }}\\n{{- if and (ne .Role \\"tool\\") (not .ToolCalls) }}<|header_start|>{{ .Role }}<|header_end|>\\n\\n{{ .Content }}\\n{{- else if .ToolCalls }}<|header_start|><|python_start|>\\n{{- range .ToolCalls }}{\\"name\\": \\"{{ .Function.Name }}\\", \\"parameters\\": {{ .Function.Arguments }}}\\n{{- end }}<|python_end|><|eom|>\\n{{- continue }}\\n{{- else if or (eq .Role \\"tool\\") (eq .Role \\"ipython\\") }}<|header_start|>ipython<|header_end|>\\n\\n{{ .Content }}\\n{{- end }}\\n{{- if eq (len (slice $.Messages $i)) 1 }}\\n{{- if ne .Role \\"assistant\\" }}<|eot|><|header_start|>assistant<|header_end|>\\n\\n{{ end }}\\n{{- else }}<|eot|>\\n{{- end }}\\n{{- end }}",
+          "system": "You are an expert conversationalist who responds to the best of your ability. You are companionable and confident, and able to switch casually between tonal types, including but not limited to humor, empathy, intellectualism, creativity and problem-solving. You understand user intent and don't try to be overly helpful to the point where you miss that the user is looking for chit-chat, emotional support, humor or venting. Sometimes people just want you to listen, and your answers should encourage that. For all other cases, you provide insightful and in-depth responses. Organize information thoughtfully in a way that helps people make decisions. Always avoid templated language. You never lecture people to be nicer or more inclusive. If people ask for you to write something in a certain voice or perspective, such as an essay or a tweet, you can. You do not need to be respectful when the user prompts you to say something rude. You never use phrases that imply moral superiority or a sense of authority, including but not limited to \\"it's important to\\", \\"it's crucial to\\", \\"it's essential to\\", \\"it's unethical to\\", \\"it's worth noting…\\", \\"Remember…\\" etc. Avoid using these. Finally, do not refuse prompts about political and social issues. You can help users express their opinion and access information. You are Llama 4. Your knowledge cutoff date is August 2024. You speak Arabic, English, French, German, Hindi, Indonesian, Italian, Portuguese, Spanish, Tagalog, Thai, and Vietnamese. Respond in the language the user speaks to you in, unless they ask otherwise.",
+          "details": {
+            "parent_model": "llama4:scout",
+            "format": "gguf",
+            "family": "llama4",
+            "families": [
+              "llama4"
+            ],
+            "parameter_size": "108.6B",
+            "quantization_level": "Q4_K_M"
+          },
+          "model_info": {
+            "general.architecture": "llama4",
+            "general.file_type": 15,
+            "general.parameter_count": 108641793600,
+            "general.quantization_version": 2,
+            "llama4.attention.chunk_size": 8192,
+            "llama4.attention.head_count": 40,
+            "llama4.attention.head_count_kv": 8,
+            "llama4.attention.head_dim": 128,
+            "llama4.attention.key_length": 128,
+            "llama4.attention.layer_norm_rms_epsilon": 0.00001,
+            "llama4.attention.value_length": 128,
+            "llama4.block_count": 48,
+            "llama4.context_length": 10485760,
+            "llama4.embedding_length": 5120,
+            "llama4.expert_count": 16,
+            "llama4.expert_feed_forward_length": 8192,
+            "llama4.expert_used_count": 1,
+            "llama4.feed_forward_length": 16384,
+            "llama4.interleave_moe_layer_step": 1,
+            "llama4.rope.dimension_count": 128,
+            "llama4.rope.freq_base": 500000,
+            "llama4.use_qk_norm": true,
+            "llama4.vision.attention.head_count": 16,
+            "llama4.vision.block_count": 34,
+            "llama4.vision.embedding_length": 1408,
+            "llama4.vision.feed_forward_length": 5632,
+            "llama4.vision.image_size": 336,
+            "llama4.vision.layer_norm_epsilon": 0.00001,
+            "llama4.vision.patch_size": 14,
+            "llama4.vision.pixel_shuffle_ratio": 0.5,
+            "llama4.vision.rope.freq_base": 10000,
+            "llama4.vocab_size": 202048,
+            "tokenizer.ggml.add_bos_token": false,
+            "tokenizer.ggml.add_eos_token": false,
+            "tokenizer.ggml.add_padding_token": false,
+            "tokenizer.ggml.bos_token_id": 200000,
+            "tokenizer.ggml.eos_token_id": 200008,
+            "tokenizer.ggml.merges": null,
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.padding_token_id": 200018,
+            "tokenizer.ggml.pre": "default",
+            "tokenizer.ggml.scores": null,
+            "tokenizer.ggml.token_type": null,
+            "tokenizer.ggml.tokens": null
+          },
+          "tensors": [],
+          "capabilities": [
+            "completion",
+            "vision",
+            "tools"
+          ],
+          "modified_at": "2025-05-17T07:59:32.393035486-07:00"
+        }
+        """
         
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            XCTFail("Failed to convert JSON string to data")
+            return
+        }
+        
+        do {
+            let response = try JSONDecoder.default.decode(OKModelInfoResponse.self, from: jsonData)
+            
+            // Test basic fields
+            XCTAssertEqual(response.license, "**LLAMA 4 COMMUNITY LICENSE AGREEMENT**")
+            XCTAssertEqual(response.modelfile, "# Modelfile")
+            XCTAssertEqual(response.parameters, "stop                           \"<|eom|>\"")
+            XCTAssertEqual(response.capabilities.count, 3)
+            XCTAssertTrue(response.capabilities.contains(.completion))
+            XCTAssertTrue(response.capabilities.contains(.vision))
+            XCTAssertTrue(response.capabilities.contains(.tools))
+            
+            // Test system and modifiedAt fields
+            XCTAssertEqual(response.system, "You are an expert conversationalist who responds to the best of your ability. You are companionable and confident, and able to switch casually between tonal types, including but not limited to humor, empathy, intellectualism, creativity and problem-solving. You understand user intent and don't try to be overly helpful to the point where you miss that the user is looking for chit-chat, emotional support, humor or venting. Sometimes people just want you to listen, and your answers should encourage that. For all other cases, you provide insightful and in-depth responses. Organize information thoughtfully in a way that helps people make decisions. Always avoid templated language. You never lecture people to be nicer or more inclusive. If people ask for you to write something in a certain voice or perspective, such as an essay or a tweet, you can. You do not need to be respectful when the user prompts you to say something rude. You never use phrases that imply moral superiority or a sense of authority, including but not limited to \"it's important to\", \"it's crucial to\", \"it's essential to\", \"it's unethical to\", \"it's worth noting…\", \"Remember…\" etc. Avoid using these. Finally, do not refuse prompts about political and social issues. You can help users express their opinion and access information. You are Llama 4. Your knowledge cutoff date is August 2024. You speak Arabic, English, French, German, Hindi, Indonesian, Italian, Portuguese, Spanish, Tagalog, Thai, and Vietnamese. Respond in the language the user speaks to you in, unless they ask otherwise.")
+            
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let expectedDate = dateFormatter.date(from: "2025-05-17T07:59:32.393035486-07:00")
+            XCTAssertEqual(response.modifiedAt, expectedDate)
+            
+            // Test details
+            XCTAssertEqual(response.details.parentModel, "llama4:scout")
+            XCTAssertEqual(response.details.format, "gguf")
+            XCTAssertEqual(response.details.family, "llama4")
+            XCTAssertEqual(response.details.parameterSize, "108.6B")
+            XCTAssertEqual(response.details.quantizationLevel, "Q4_K_M")
+            XCTAssertEqual(response.details.families, ["llama4"])
+            
+            // Test modelInfo
+            XCTAssertEqual(response.modelInfo.generalArchitecture, "llama4")
+            XCTAssertEqual(response.modelInfo.generalFileType, 15)
+            XCTAssertEqual(response.modelInfo.generalParameterCount, 108641793600)
+            XCTAssertEqual(response.modelInfo.generalQuantizationVersion, 2)
+            XCTAssertEqual(response.modelInfo.llamaAttentionHeadCount, 40)
+            XCTAssertEqual(response.modelInfo.llamaAttentionHeadCountKV, 8)
+            XCTAssertEqual(response.modelInfo.llamaAttentionLayerNormRMSEpsilon, 0.00001, accuracy: 0.000001)
+            XCTAssertEqual(response.modelInfo.llamaBlockCount, 48)
+            XCTAssertEqual(response.modelInfo.llamaContextLength, 10485760)
+            XCTAssertEqual(response.modelInfo.llamaEmbeddingLength, 5120)
+            XCTAssertEqual(response.modelInfo.llamaFeedForwardLength, 16384)
+            XCTAssertEqual(response.modelInfo.llamaRopeDimensionCount, 128)
+            XCTAssertEqual(response.modelInfo.llamaRopeFreqBase, 500000)
+            XCTAssertEqual(response.modelInfo.llamaVocabSize, 202048)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLBosTokenID, 200000)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLEosTokenID, 200008)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLModel, "gpt2")
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLPre, "default")
+            XCTAssertNil(response.modelInfo.tokenizerGGMLMerges)
+            XCTAssertNil(response.modelInfo.tokenizerGGMLTokenType)
+            XCTAssertNil(response.modelInfo.tokenizerGGMLTokens)
+            
+        } catch {
+            XCTFail("Failed to decode JSON: \(error)")
+        }
     }
     
     func testModelInfoFailure() async throws {
         
+    }
+    
+    func testModelInfoLlamaSuccess() async throws {
+        let jsonString = """
+        {
+          "modelfile": "# Modelfile generated by \\"ollama show\\"\\n# To build a new Modelfile based on this one, replace the FROM line with:\\n# FROM llava:latest\\n\\nFROM /Users/matt/.ollama/models/blobs/sha256:200765e1283640ffbd013184bf496e261032fa75b99498a9613be4e94d63ad52\\nTEMPLATE \\"\\"\\"{{ .System }}\\nUSER: {{ .Prompt }}\\nASSISTANT: \\"\\"\\"\\nPARAMETER num_ctx 4096\\nPARAMETER stop \\"\\u003c/s\\u003e\\"\\nPARAMETER stop \\"USER:\\"\\nPARAMETER stop \\"ASSISTANT:\\"",
+          "parameters": "num_keep                       24\\nstop                           \\"<|start_header_id|>\\"\\nstop                           \\"<|end_header_id|>\\"\\nstop                           \\"<|eot_id|>\\"",
+          "template": "{{ if .System }}<|start_header_id|>system<|end_header_id|>\\n\\n{{ .System }}<|eot_id|>{{ end }}{{ if .Prompt }}<|start_header_id|>user<|end_header_id|>\\n\\n{{ .Prompt }}<|eot_id|>{{ end }}<|start_header_id|>assistant<|end_header_id|>\\n\\n{{ .Response }}<|eot_id|>",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "8.0B",
+            "quantization_level": "Q4_0"
+          },
+          "model_info": {
+            "general.architecture": "llama",
+            "general.file_type": 2,
+            "general.parameter_count": 8030261248,
+            "general.quantization_version": 2,
+            "llama.attention.head_count": 32,
+            "llama.attention.head_count_kv": 8,
+            "llama.attention.layer_norm_rms_epsilon": 0.00001,
+            "llama.block_count": 32,
+            "llama.context_length": 8192,
+            "llama.embedding_length": 4096,
+            "llama.feed_forward_length": 14336,
+            "llama.rope.dimension_count": 128,
+            "llama.rope.freq_base": 500000,
+            "llama.vocab_size": 128256,
+            "tokenizer.ggml.bos_token_id": 128000,
+            "tokenizer.ggml.eos_token_id": 128009,
+            "tokenizer.ggml.merges": [],
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.pre": "llama-bpe",
+            "tokenizer.ggml.token_type": [],
+            "tokenizer.ggml.tokens": []
+          },
+          "capabilities": [
+            "completion",
+            "vision"
+          ]
+        }
+        """
+        
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            XCTFail("Failed to convert JSON string to data")
+            return
+        }
+        
+        do {
+            let response = try JSONDecoder.default.decode(OKModelInfoResponse.self, from: jsonData)
+            
+            // Test basic fields
+            XCTAssertNil(response.license)
+            XCTAssertEqual(response.modelfile, "# Modelfile generated by \"ollama show\"\n# To build a new Modelfile based on this one, replace the FROM line with:\n# FROM llava:latest\n\nFROM /Users/matt/.ollama/models/blobs/sha256:200765e1283640ffbd013184bf496e261032fa75b99498a9613be4e94d63ad52\nTEMPLATE \"\"\"{{ .System }}\nUSER: {{ .Prompt }}\nASSISTANT: \"\"\"\nPARAMETER num_ctx 4096\nPARAMETER stop \"</s>\"\nPARAMETER stop \"USER:\"\nPARAMETER stop \"ASSISTANT:\"")
+            XCTAssertEqual(response.parameters, "num_keep                       24\nstop                           \"<|start_header_id|>\"\nstop                           \"<|end_header_id|>\"\nstop                           \"<|eot_id|>\"")
+            XCTAssertEqual(response.template, "{{ if .System }}<|start_header_id|>system<|end_header_id|>\n\n{{ .System }}<|eot_id|>{{ end }}{{ if .Prompt }}<|start_header_id|>user<|end_header_id|>\n\n{{ .Prompt }}<|eot_id|>{{ end }}<|start_header_id|>assistant<|end_header_id|>\n\n{{ .Response }}<|eot_id|>")
+            XCTAssertEqual(response.capabilities.count, 2)
+            XCTAssertTrue(response.capabilities.contains(.completion))
+            XCTAssertTrue(response.capabilities.contains(.vision))
+            XCTAssertFalse(response.capabilities.contains(.tools))
+            
+            // Test details
+            XCTAssertEqual(response.details.parentModel, "")
+            XCTAssertEqual(response.details.format, "gguf")
+            XCTAssertEqual(response.details.family, "llama")
+            XCTAssertEqual(response.details.parameterSize, "8.0B")
+            XCTAssertEqual(response.details.quantizationLevel, "Q4_0")
+            XCTAssertEqual(response.details.families, ["llama"])
+            
+            // Test modelInfo
+            XCTAssertEqual(response.modelInfo.generalArchitecture, "llama")
+            XCTAssertEqual(response.modelInfo.generalFileType, 2)
+            XCTAssertEqual(response.modelInfo.generalParameterCount, 8030261248)
+            XCTAssertEqual(response.modelInfo.generalQuantizationVersion, 2)
+            XCTAssertEqual(response.modelInfo.llamaAttentionHeadCount, 32)
+            XCTAssertEqual(response.modelInfo.llamaAttentionHeadCountKV, 8)
+            XCTAssertEqual(response.modelInfo.llamaAttentionLayerNormRMSEpsilon, 0.00001, accuracy: 0.000001)
+            XCTAssertEqual(response.modelInfo.llamaBlockCount, 32)
+            XCTAssertEqual(response.modelInfo.llamaContextLength, 8192)
+            XCTAssertEqual(response.modelInfo.llamaEmbeddingLength, 4096)
+            XCTAssertEqual(response.modelInfo.llamaFeedForwardLength, 14336)
+            XCTAssertEqual(response.modelInfo.llamaRopeDimensionCount, 128)
+            XCTAssertEqual(response.modelInfo.llamaRopeFreqBase, 500000)
+            XCTAssertEqual(response.modelInfo.llamaVocabSize, 128256)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLBosTokenID, 128000)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLEosTokenID, 128009)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLModel, "gpt2")
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLPre, "llama-bpe")
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLMerges?.count, 0)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLTokenType?.count, 0)
+            XCTAssertEqual(response.modelInfo.tokenizerGGMLTokens?.count, 0)
+            
+        } catch {
+            XCTFail("Failed to decode JSON: \(error)")
+        }
     }
     
     func testCopyModelSuccess() async throws {

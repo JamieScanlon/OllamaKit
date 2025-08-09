@@ -10,7 +10,7 @@ import Foundation
 /// A structure that represents the response containing information about a specific model from the Ollama API.
 public struct OKModelInfoResponse: Decodable, Sendable {
     /// A string detailing the licensing information for the model.
-    public let license: String
+    public let license: String?
     
     /// A string representing the template used by the model.
     public let template: String
@@ -23,6 +23,12 @@ public struct OKModelInfoResponse: Decodable, Sendable {
     
     /// A list of model capabilities (like vision, tools)
     public let capabilities: [Capability]
+    
+    /// An optional string containing system information about the model.
+    public let system: String?
+    
+    /// An optional date representing when the model was last modified.
+    public let modifiedAt: Date?
     
     /// An enumeration representing the exact model capability
     public enum Capability: String, Decodable, Sendable {
@@ -93,6 +99,125 @@ public struct OKModelInfoResponse: Decodable, Sendable {
             case generalFileType = "general.fileType"
             case generalParameterCount = "general.parameterCount"
             case generalQuantizationVersion = "general.quantizationVersion"
+            case llamaAttentionHeadCount = "llama4.attention.headCount"
+            case llamaAttentionHeadCountKV = "llama4.attention.headCountKv"
+            case llamaAttentionLayerNormRMSEpsilon = "llama4.attention.layerNormRmsEpsilon"
+            case llamaBlockCount = "llama4.blockCount"
+            case llamaContextLength = "llama4.contextLength"
+            case llamaEmbeddingLength = "llama4.embeddingLength"
+            case llamaFeedForwardLength = "llama4.feedForwardLength"
+            case llamaRopeDimensionCount = "llama4.rope.dimensionCount"
+            case llamaRopeFreqBase = "llama4.rope.freqBase"
+            case llamaVocabSize = "llama4.vocabSize"
+            case tokenizerGGMLBosTokenID = "tokenizer.ggml.bosTokenId"
+            case tokenizerGGMLEosTokenID = "tokenizer.ggml.eosTokenId"
+            case tokenizerGGMLMerges = "tokenizer.ggml.merges"
+            case tokenizerGGMLModel = "tokenizer.ggml.model"
+            case tokenizerGGMLPre = "tokenizer.ggml.pre"
+            case tokenizerGGMLTokenType = "tokenizer.ggml.tokenType"
+            case tokenizerGGMLTokens = "tokenizer.ggml.tokens"
+        }
+        
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            
+            // Decode general fields
+            generalArchitecture = try container.decode(String.self, forKey: .generalArchitecture)
+            generalFileType = try container.decode(Int.self, forKey: .generalFileType)
+            generalParameterCount = try container.decode(Int.self, forKey: .generalParameterCount)
+            generalQuantizationVersion = try container.decode(Int.self, forKey: .generalQuantizationVersion)
+            
+            // Try to decode llama4 fields first, then fall back to llama fields
+            let llama4Container = try decoder.container(keyedBy: Llama4CodingKeys.self)
+            let llamaContainer = try decoder.container(keyedBy: LlamaCodingKeys.self)
+            
+            // Try llama4 first, then fall back to llama
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaAttentionHeadCount) {
+                llamaAttentionHeadCount = value
+            } else {
+                llamaAttentionHeadCount = try llamaContainer.decode(Int.self, forKey: .llamaAttentionHeadCount)
+            }
+            
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaAttentionHeadCountKV) {
+                llamaAttentionHeadCountKV = value
+            } else {
+                llamaAttentionHeadCountKV = try llamaContainer.decode(Int.self, forKey: .llamaAttentionHeadCountKV)
+            }
+            
+            if let value = try? llama4Container.decode(Double.self, forKey: .llamaAttentionLayerNormRMSEpsilon) {
+                llamaAttentionLayerNormRMSEpsilon = value
+            } else {
+                llamaAttentionLayerNormRMSEpsilon = try llamaContainer.decode(Double.self, forKey: .llamaAttentionLayerNormRMSEpsilon)
+            }
+            
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaBlockCount) {
+                llamaBlockCount = value
+            } else {
+                llamaBlockCount = try llamaContainer.decode(Int.self, forKey: .llamaBlockCount)
+            }
+            
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaContextLength) {
+                llamaContextLength = value
+            } else {
+                llamaContextLength = try llamaContainer.decode(Int.self, forKey: .llamaContextLength)
+            }
+            
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaEmbeddingLength) {
+                llamaEmbeddingLength = value
+            } else {
+                llamaEmbeddingLength = try llamaContainer.decode(Int.self, forKey: .llamaEmbeddingLength)
+            }
+            
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaFeedForwardLength) {
+                llamaFeedForwardLength = value
+            } else {
+                llamaFeedForwardLength = try llamaContainer.decode(Int.self, forKey: .llamaFeedForwardLength)
+            }
+            
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaRopeDimensionCount) {
+                llamaRopeDimensionCount = value
+            } else {
+                llamaRopeDimensionCount = try llamaContainer.decode(Int.self, forKey: .llamaRopeDimensionCount)
+            }
+            
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaRopeFreqBase) {
+                llamaRopeFreqBase = value
+            } else {
+                llamaRopeFreqBase = try llamaContainer.decode(Int.self, forKey: .llamaRopeFreqBase)
+            }
+            
+            if let value = try? llama4Container.decode(Int.self, forKey: .llamaVocabSize) {
+                llamaVocabSize = value
+            } else {
+                llamaVocabSize = try llamaContainer.decode(Int.self, forKey: .llamaVocabSize)
+            }
+            
+            // Decode tokenizer fields
+            tokenizerGGMLBosTokenID = try container.decode(Int.self, forKey: .tokenizerGGMLBosTokenID)
+            tokenizerGGMLEosTokenID = try container.decode(Int.self, forKey: .tokenizerGGMLEosTokenID)
+            tokenizerGGMLMerges = try container.decodeIfPresent([String].self, forKey: .tokenizerGGMLMerges)
+            tokenizerGGMLModel = try container.decode(String.self, forKey: .tokenizerGGMLModel)
+            tokenizerGGMLPre = try container.decode(String.self, forKey: .tokenizerGGMLPre)
+            tokenizerGGMLTokenType = try container.decodeIfPresent([String].self, forKey: .tokenizerGGMLTokenType)
+            tokenizerGGMLTokens = try container.decodeIfPresent([String].self, forKey: .tokenizerGGMLTokens)
+        }
+        
+        // Coding keys for llama4 prefix
+        private enum Llama4CodingKeys: String, CodingKey {
+            case llamaAttentionHeadCount = "llama4.attention.headCount"
+            case llamaAttentionHeadCountKV = "llama4.attention.headCountKv"
+            case llamaAttentionLayerNormRMSEpsilon = "llama4.attention.layerNormRmsEpsilon"
+            case llamaBlockCount = "llama4.blockCount"
+            case llamaContextLength = "llama4.contextLength"
+            case llamaEmbeddingLength = "llama4.embeddingLength"
+            case llamaFeedForwardLength = "llama4.feedForwardLength"
+            case llamaRopeDimensionCount = "llama4.rope.dimensionCount"
+            case llamaRopeFreqBase = "llama4.rope.freqBase"
+            case llamaVocabSize = "llama4.vocabSize"
+        }
+        
+        // Coding keys for llama prefix
+        private enum LlamaCodingKeys: String, CodingKey {
             case llamaAttentionHeadCount = "llama.attention.headCount"
             case llamaAttentionHeadCountKV = "llama.attention.headCountKv"
             case llamaAttentionLayerNormRMSEpsilon = "llama.attention.layerNormRmsEpsilon"
@@ -103,13 +228,6 @@ public struct OKModelInfoResponse: Decodable, Sendable {
             case llamaRopeDimensionCount = "llama.rope.dimensionCount"
             case llamaRopeFreqBase = "llama.rope.freqBase"
             case llamaVocabSize = "llama.vocabSize"
-            case tokenizerGGMLBosTokenID = "tokenizer.ggml.bosTokenId"
-            case tokenizerGGMLEosTokenID = "tokenizer.ggml.eosTokenId"
-            case tokenizerGGMLMerges = "tokenizer.ggml.merges"
-            case tokenizerGGMLModel = "tokenizer.ggml.model"
-            case tokenizerGGMLPre = "tokenizer.ggml.pre"
-            case tokenizerGGMLTokenType = "tokenizer.ggml.tokenType"
-            case tokenizerGGMLTokens = "tokenizer.ggml.tokens"
         }
     }
 }
