@@ -418,4 +418,159 @@ final class OllamaKitTests: XCTestCase {
     func testEmbeddingsFailure() async throws {
         
     }
+    
+    func testChatResponseSuccess() async throws {
+        let jsonString = """
+        {
+            "model": "deepseek-r1",
+            "created_at": "2025-05-29T09:35:56.836222Z",
+            "message": {
+                "role": "assistant",
+                "content": "The word \\"strawberry\\" contains **three** instances of the letter 'R' ...",
+                "thinking": "First, the question is: \\"how many r in the word  strawberry?\\" I need to count the number of times the letter 'r' appears in the word \\"strawberry\\". Let me write down the word:..."
+            },
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 47975065417,
+            "load_duration": 29758167,
+            "prompt_eval_count": 10,
+            "prompt_eval_duration": 174191542,
+            "eval_count": 2514,
+            "eval_duration": 47770692833
+        }
+        """
+        
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            XCTFail("Failed to convert JSON string to data")
+            return
+        }
+        
+        do {
+            let response = try JSONDecoder.default.decode(OKChatResponse.self, from: jsonData)
+            
+            // Test basic fields
+            XCTAssertEqual(response.model, "deepseek-r1")
+            
+            // Test createdAt field
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let expectedDate = dateFormatter.date(from: "2025-05-29T09:35:56.836222Z")
+            XCTAssertEqual(response.createdAt, expectedDate)
+            
+            // Test message field
+            XCTAssertNotNil(response.message)
+            let message = response.message!
+            XCTAssertEqual(message.role, .assistant)
+            XCTAssertEqual(message.content, "The word \"strawberry\" contains **three** instances of the letter 'R' ...")
+            XCTAssertEqual(message.thinking, "First, the question is: \"how many r in the word  strawberry?\" I need to count the number of times the letter 'r' appears in the word \"strawberry\". Let me write down the word:...")
+            
+            // Test top-level fields
+            XCTAssertTrue(response.done)
+            XCTAssertEqual(response.doneReason, "stop")
+            XCTAssertEqual(response.totalDuration, 47975065417)
+            XCTAssertEqual(response.loadDuration, 29758167)
+            XCTAssertEqual(response.promptEvalCount, 10)
+            XCTAssertEqual(response.promptEvalDuration, 174191542)
+            XCTAssertEqual(response.evalCount, 2514)
+            XCTAssertEqual(response.evalDuration, 47770692833)
+            
+        } catch {
+            XCTFail("Failed to decode JSON: \(error)")
+        }
+    }
+    
+    func testChatResponseWithToolCalls() async throws {
+        let jsonString = """
+        {
+            "model": "llama4-tools",
+            "created_at": "2025-05-29T10:00:00.000000Z",
+            "message": {
+                "role": "assistant",
+                "content": "I'll help you with that calculation.",
+                "tool_calls": [
+                    {
+                        "function": {
+                            "name": "calculator",
+                            "arguments": "{\\"operation\\": \\"add\\", \\"a\\": 5, \\"b\\": 3}"
+                        }
+                    }
+                ]
+            },
+            "done": false
+        }
+        """
+        
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            XCTFail("Failed to convert JSON string to data")
+            return
+        }
+        
+        do {
+            let response = try JSONDecoder.default.decode(OKChatResponse.self, from: jsonData)
+            
+            // Test basic fields
+            XCTAssertEqual(response.model, "llama4-tools")
+            XCTAssertFalse(response.done)
+            
+            // Test message with tool calls
+            XCTAssertNotNil(response.message)
+            let message = response.message!
+            XCTAssertEqual(message.role, .assistant)
+            XCTAssertEqual(message.content, "I'll help you with that calculation.")
+            
+            // Test tool calls
+            XCTAssertNotNil(message.toolCalls)
+            XCTAssertEqual(message.toolCalls?.count, 1)
+            
+            let toolCall = message.toolCalls![0]
+            XCTAssertNotNil(toolCall.function)
+            XCTAssertEqual(toolCall.function?.name, "calculator")
+            XCTAssertNotNil(toolCall.function?.arguments)
+            
+        } catch {
+            XCTFail("Failed to decode JSON: \(error)")
+        }
+    }
+    
+    func testChatResponseWithImages() async throws {
+        let jsonString = """
+        {
+            "model": "llava-vision",
+            "created_at": "2025-05-29T11:00:00.000000Z",
+            "message": {
+                "role": "assistant",
+                "content": "I can see the image you've shared.",
+                "images": ["base64_encoded_image_data_here"]
+            },
+            "done": true
+        }
+        """
+        
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            XCTFail("Failed to convert JSON string to data")
+            return
+        }
+        
+        do {
+            let response = try JSONDecoder.default.decode(OKChatResponse.self, from: jsonData)
+            
+            // Test basic fields
+            XCTAssertEqual(response.model, "llava-vision")
+            XCTAssertTrue(response.done)
+            
+            // Test message with images
+            XCTAssertNotNil(response.message)
+            let message = response.message!
+            XCTAssertEqual(message.role, .assistant)
+            XCTAssertEqual(message.content, "I can see the image you've shared.")
+            
+            // Test images
+            XCTAssertNotNil(message.images)
+            XCTAssertEqual(message.images?.count, 1)
+            XCTAssertEqual(message.images?[0], "base64_encoded_image_data_here")
+            
+        } catch {
+            XCTFail("Failed to decode JSON: \(error)")
+        }
+    }
 }
