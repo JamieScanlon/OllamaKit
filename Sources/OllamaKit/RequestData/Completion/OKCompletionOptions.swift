@@ -9,23 +9,6 @@ import Foundation
 
 // A structure that encapsulates options for controlling the behavior of content generation in the Ollama API.
 public struct OKCompletionOptions: Encodable, Sendable {
-    /// Optional integer to enable Mirostat sampling for controlling perplexity.
-    /// (0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)
-    /// Mirostat sampling helps regulate the unpredictability of the output,
-    /// balancing coherence and diversity. The default value is 0, which disables Mirostat.
-    public var mirostat: Int?
-    
-    /// Optional double influencing the adjustment speed of the Mirostat algorithm.
-    /// (Lower values result in slower adjustments, higher values increase responsiveness.)
-    /// This parameter, `mirostatEta`, adjusts how quickly the algorithm reacts to feedback
-    /// from the generated text. A default value of 0.1 provides a moderate adjustment speed.
-    public var mirostatEta: Double?
-    
-    /// Optional double controlling the balance between coherence and diversity.
-    /// (Lower values lead to more focused and coherent text)
-    /// The `mirostatTau` parameter sets the target perplexity level, influencing how
-    /// creative or constrained the text generation should be. Default is 5.0.
-    public var mirostatTau: Double?
     
     /// Optional integer setting the size of the context window for token generation.
     /// This defines the number of previous tokens the model considers when generating new tokens.
@@ -41,6 +24,19 @@ public struct OKCompletionOptions: Encodable, Sendable {
     /// A higher value increases the penalty for repeated tokens, discouraging repetition.
     /// The default value is 1.1, providing moderate repetition control.
     public var repeatPenalty: Double?
+    
+    /// Optional double setting the penalty strength for repetitions.
+    /// The Presence Penalty parameter prevents the model from repeating a word, even if it's only been used once
+    /// Encourages using different words
+    public var presencePenalty: Double?
+    
+    /// Optional double setting the penalty strength for repetitions.
+    /// Tells the model not to repeat a word that has already been used multiple times in the conversation
+    /// Avoid using the same words too often
+    public var frequencyPenalty: Double?
+    
+    ///
+    public var penalizeNewline: Bool?
     
     /// Optional double to control the model's creativity.
     /// (Higher values increase creativity and randomness)
@@ -83,13 +79,39 @@ public struct OKCompletionOptions: Encodable, Sendable {
     /// focusing the model's output on more probable sequences. Default is 0.0, meaning no filtering.
     public var minP: Double?
     
-    public init(mirostat: Int? = nil, mirostatEta: Double? = nil, mirostatTau: Double? = nil, numCtx: Int? = nil, repeatLastN: Int? = nil, repeatPenalty: Double? = nil, temperature: Double? = nil, seed: Int? = nil, stop: String? = nil, tfsZ: Double? = nil, numPredict: Int? = nil, topK: Int? = nil, topP: Double? = nil, minP: Double? = nil) {
-        self.mirostat = mirostat
-        self.mirostatEta = mirostatEta
-        self.mirostatTau = mirostatTau
+    /// Optional double for the typical probability threshold for token inclusion.
+    /// Local typicality measures how similar the conditional probability of predicting a target token next is
+    /// to the expected conditional probability of predicting a random token next, given the partial text already
+    /// generated. If set to `float < 1`, the smallest set of the most locally typical tokens with probabilities
+    /// that add up to `typicalP` or higher are kept for generation
+    public var typicalP: Double?
+    
+    ///
+    public var numa: Bool?
+    
+    public var numBatch: Int?
+    public var numGpu: Int?
+    public var mainGpu: Int?
+    public var useMmap: Bool?
+    public var numThread: Int?
+    
+    /// Optional integer for the Tokens To Kee  p On Context Refresh.
+    /// Description : This setting determines how many tokens are retained when the context is refreshed or truncated.
+    /// Impact :
+    /// * Higher Value : More of the recent context is preserved, which can help maintain relevance and coherence but may limit the model's ability to consider older parts of the conversation.
+    /// * Lower Value : Less recent context is retained, which can reduce memory usage but might lead to less coherent responses.
+    /// Tuning :
+    /// * For maintaining a more consistent conversation flow, increase num_keep.
+    /// * To manage memory more efficiently, decrease num_keep.
+    public var numKeep: Int?
+    
+    public init(numCtx: Int? = nil, repeatLastN: Int? = nil, repeatPenalty: Double? = nil, presencePenalty: Double? = nil, penalizeNewline: Bool? = nil, frequencyPenalty: Double? = nil, temperature: Double? = nil, seed: Int? = nil, stop: String? = nil, tfsZ: Double? = nil, numPredict: Int? = nil, topK: Int? = nil, topP: Double? = nil, minP: Double? = nil, typicalP: Double? = nil, numKeep: Int? = nil, numa: Bool? = nil, numBatch: Int? = nil, numGpu: Int? = nil , mainGpu: Int? = nil, useMmap: Bool? = nil, numThread: Int? = nil) {
         self.numCtx = numCtx
         self.repeatLastN = repeatLastN
         self.repeatPenalty = repeatPenalty
+        self.presencePenalty = presencePenalty
+        self.frequencyPenalty = frequencyPenalty
+        self.penalizeNewline = penalizeNewline
         self.temperature = temperature
         self.seed = seed
         self.stop = stop
@@ -98,5 +120,13 @@ public struct OKCompletionOptions: Encodable, Sendable {
         self.topK = topK
         self.topP = topP
         self.minP = minP
+        self.typicalP = typicalP
+        self.numKeep = numKeep
+        self.numa = numa
+        self.numBatch = numBatch
+        self.numGpu = numGpu
+        self.mainGpu = mainGpu
+        self.useMmap = useMmap
+        self.numThread = numThread
     }
 }

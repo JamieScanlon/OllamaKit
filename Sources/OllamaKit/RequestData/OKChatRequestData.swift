@@ -20,6 +20,9 @@ public struct OKChatRequestData: Sendable {
     
     /// An optional array of ``JSON`` representing the tools available for tool calling in the chat.
     public let tools: [JSON]?
+    
+    /// (for thinking models) should the model think before responding?
+    public let think: Bool?
 
     /// Optional ``JSON`` representing the JSON schema for the response.
     /// Be sure to also include "return as JSON" in your prompt
@@ -28,11 +31,15 @@ public struct OKChatRequestData: Sendable {
     /// Optional ``OKCompletionOptions`` providing additional configuration for the chat request.
     public var options: OKCompletionOptions?
     
-    public init(model: String, messages: [Message], tools: [JSON]? = nil, format: JSON? = nil) {
+    /// Controls how long the model will stay loaded into memory following the request (default: 5m)
+    public var keepAlive: Int?
+    
+    public init(model: String, messages: [Message], tools: [JSON]? = nil, think: Bool? = nil, format: JSON? = nil) {
         self.stream = true
         self.model = model
         self.messages = messages
         self.tools = tools
+        self.think = think
         self.format = format
     }
     
@@ -46,6 +53,15 @@ public struct OKChatRequestData: Sendable {
         
         /// An optional array of base64-encoded images.
         public let images: [String]?
+        
+        /// An optional array of ``ToolCall`` instances representing any tools invoked in the response.
+        public var toolCalls: [ToolCall]?
+        
+        /// (for thinking models) the model's thinking process
+        public var thinking: String?
+        
+        /// (optional): add the name of the tool that was executed to inform the model of the result
+        public var toolName: String?
         
         public init(role: Role, content: String, images: [String]? = nil) {
             self.role = role
@@ -63,6 +79,24 @@ public struct OKChatRequestData: Sendable {
             
             /// Indicates the message is from the user.
             case user
+            
+            /// The message is from a tool.
+            case tool
+        }
+        
+        /// A structure that represents a tool call in the response.
+        public struct ToolCall: Codable, Sendable {
+            /// An optional ``Function`` structure representing the details of the tool call.
+            public let function: Function?
+            
+            /// A structure that represents the details of a tool call.
+            public struct Function: Codable, Sendable {
+                /// The name of the tool being called.
+                public let name: String?
+                
+                /// An optional ``JSON`` representing the arguments passed to the tool.
+                public let arguments: JSON?
+            }
         }
     }
 }
@@ -75,6 +109,7 @@ extension OKChatRequestData: Encodable {
         try container.encode(messages, forKey: .messages)
         try container.encodeIfPresent(tools, forKey: .tools)
         try container.encodeIfPresent(format, forKey: .format)
+        try container.encodeIfPresent(keepAlive, forKey: .keepAlive)
 
         if let options {
             try options.encode(to: encoder)
@@ -82,6 +117,6 @@ extension OKChatRequestData: Encodable {
     }
     
     private enum CodingKeys: String, CodingKey {
-        case stream, model, messages, tools, format
+        case stream, model, messages, tools, format, options, keepAlive
     }
 }

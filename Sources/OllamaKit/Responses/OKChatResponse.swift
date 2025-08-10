@@ -52,8 +52,17 @@ public struct OKChatResponse: OKCompletionResponse, Decodable, Sendable {
         /// The content of the message.
         public var content: String
         
+        /// An optional array of base64-encoded images.
+        public let images: [String]?
+        
         /// An optional array of ``ToolCall`` instances representing any tools invoked in the response.
         public var toolCalls: [ToolCall]?
+        
+        /// (for thinking models) the model's thinking process
+        public var thinking: String?
+        
+        /// (optional): add the name of the tool that was executed to inform the model of the result
+        public var toolName: String?
         
         /// An enumeration representing the role of the message sender.
         public enum Role: String, Decodable, Sendable {
@@ -65,6 +74,9 @@ public struct OKChatResponse: OKCompletionResponse, Decodable, Sendable {
             
             /// The message is from the user.
             case user
+            
+            /// The message is from a tool.
+            case tool
         }
         
         /// A structure that represents a tool call in the response.
