@@ -397,6 +397,65 @@ final class OllamaKitTests: XCTestCase {
         }
     }
     
+    func testModelInfoWithoutTokenizerFieldsSuccess() async throws {
+        // Some models omit tokenizer.ggml fields (e.g. bos_token_id, eos_token_id, model, pre)
+        // This test verifies decoding succeeds when those fields are missing
+        let jsonString = """
+        {
+          "license": "MIT",
+          "modelfile": "# Modelfile",
+          "parameters": "temperature 0.7",
+          "template": "{{ .Prompt }}",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "custom",
+            "families": ["custom"],
+            "parameter_size": "1.0B",
+            "quantization_level": "Q4_0"
+          },
+          "model_info": {
+            "general.architecture": "custom",
+            "general.file_type": 2,
+            "general.parameter_count": 1000000000,
+            "general.quantization_version": 2,
+            "custom.context_length": 4096,
+            "custom.embedding_length": 1024
+          },
+          "tensors": [],
+          "capabilities": ["completion"],
+          "modified_at": "2025-01-01T00:00:00.000Z"
+        }
+        """
+        
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            XCTFail("Failed to convert JSON string to data")
+            return
+        }
+        
+        do {
+            let response = try JSONDecoder.default.decode(OKModelInfoResponse.self, from: jsonData)
+            
+            // General fields should decode
+            XCTAssertEqual(response.modelInfo.generalArchitecture, "custom")
+            XCTAssertEqual(response.modelInfo.generalFileType, 2)
+            XCTAssertEqual(response.modelInfo.generalParameterCount, 1000000000)
+            XCTAssertEqual(response.modelInfo.generalQuantizationVersion, 2)
+            
+            // Tokenizer fields should be nil when absent
+            XCTAssertNil(response.modelInfo.tokenizerGGMLBosTokenID)
+            XCTAssertNil(response.modelInfo.tokenizerGGMLEosTokenID)
+            XCTAssertNil(response.modelInfo.tokenizerGGMLModel)
+            XCTAssertNil(response.modelInfo.tokenizerGGMLPre)
+            
+            // Family properties should still be decoded
+            XCTAssertEqual(response.modelInfo.getProperty(family: "custom", property: "contextLength") as Int?, 4096)
+            XCTAssertEqual(response.modelInfo.getProperty(family: "custom", property: "embeddingLength") as Int?, 1024)
+        } catch {
+            XCTFail("Failed to decode JSON with missing tokenizer fields: \(error)")
+        }
+    }
+    
 
     
     func testCopyModelSuccess() async throws {
