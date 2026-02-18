@@ -80,11 +80,11 @@ public struct OKModelInfoResponse: Decodable, Sendable {
         
         // Note: familyProperties is now Sendable since JSON conforms to Sendable
         
-        public let tokenizerGGMLBosTokenID: Int
-        public let tokenizerGGMLEosTokenID: Int
+        public let tokenizerGGMLBosTokenID: Int?
+        public let tokenizerGGMLEosTokenID: Int?
         public let tokenizerGGMLMerges: [String]?
-        public let tokenizerGGMLModel: String
-        public let tokenizerGGMLPre: String
+        public let tokenizerGGMLModel: String?
+        public let tokenizerGGMLPre: String?
         public let tokenizerGGMLTokenType: [String]?
         public let tokenizerGGMLTokens: [String]?
         
@@ -114,12 +114,12 @@ public struct OKModelInfoResponse: Decodable, Sendable {
             generalParameterCount = try container.decode(Int.self, forKey: .generalParameterCount)
             generalQuantizationVersion = try container.decode(Int.self, forKey: .generalQuantizationVersion)
             
-            // Decode tokenizer fields
-            tokenizerGGMLBosTokenID = try container.decode(Int.self, forKey: .tokenizerGGMLBosTokenID)
-            tokenizerGGMLEosTokenID = try container.decode(Int.self, forKey: .tokenizerGGMLEosTokenID)
+            // Decode tokenizer fields (optional - some models omit these)
+            tokenizerGGMLBosTokenID = try container.decodeIfPresent(Int.self, forKey: .tokenizerGGMLBosTokenID)
+            tokenizerGGMLEosTokenID = try container.decodeIfPresent(Int.self, forKey: .tokenizerGGMLEosTokenID)
             tokenizerGGMLMerges = try container.decodeIfPresent([String].self, forKey: .tokenizerGGMLMerges)
-            tokenizerGGMLModel = try container.decode(String.self, forKey: .tokenizerGGMLModel)
-            tokenizerGGMLPre = try container.decode(String.self, forKey: .tokenizerGGMLPre)
+            tokenizerGGMLModel = try container.decodeIfPresent(String.self, forKey: .tokenizerGGMLModel)
+            tokenizerGGMLPre = try container.decodeIfPresent(String.self, forKey: .tokenizerGGMLPre)
             tokenizerGGMLTokenType = try container.decodeIfPresent([String].self, forKey: .tokenizerGGMLTokenType)
             tokenizerGGMLTokens = try container.decodeIfPresent([String].self, forKey: .tokenizerGGMLTokens)
             
