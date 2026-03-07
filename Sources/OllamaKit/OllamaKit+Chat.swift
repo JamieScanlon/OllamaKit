@@ -99,7 +99,8 @@ extension OllamaKit {
     /// - Returns: An `AsyncThrowingStream<OKChatResponse, Error>` emitting the live stream of chat responses from the Ollama API.
     public func chat(data: OKChatRequestData) -> AsyncThrowingStream<OKChatResponse, Error> {
         do {
-            let request = try OKRouter.chat(data: data).asURLRequest(with: baseURL)
+            var request = try OKRouter.chat(data: data).asURLRequest(with: baseURL)
+            request.timeoutInterval = timeoutInterval
             
             return OKHTTPClient.shared.stream(request: request, with: OKChatResponse.self)
         } catch {
