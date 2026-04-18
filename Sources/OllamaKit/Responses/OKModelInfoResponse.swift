@@ -22,7 +22,7 @@ public struct OKModelInfoResponse: Decodable, Sendable {
     /// A string detailing the parameters or settings of the model.
     public let parameters: String
     
-    /// A list of model capabilities (like vision, tools)
+    /// A list of model capabilities (like vision, tools, audio)
     public let capabilities: [Capability]
     
     /// An optional string containing system information about the model.
@@ -40,6 +40,7 @@ public struct OKModelInfoResponse: Decodable, Sendable {
         case vision
         case embedding
         case thinking
+        case audio
     }
     
     /// The details about the model.
